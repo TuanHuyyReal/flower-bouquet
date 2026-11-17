@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #6b3449;
+  --display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: linear-gradient(#fff9f2, #fbe3ea);
+  color: var(--ink);
+  font-family: var(--display);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+.canvas-wrap {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+/* ---------------------------------------------------------------- loader */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: radial-gradient(120% 90% at 50% 40%, #fff9f2 0%, #fdeaf0 70%, #f9d9e4 100%);
+}
+.loader-flower {
+  width: 84px;
+  height: 84px;
+  animation: loaderSpin 12s linear infinite;
+}
+.loader-petal {
+  fill: #f3a9bf;
+  animation: petalPulse 2.2s ease-in-out infinite;
+}
+.loader-text {
+  margin: 0;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  color: #8a4660;
+}
+.loader-bar {
+  width: min(200px, 50vw);
+  height: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(214, 122, 150, 0.2);
+}
+.loader-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #f3a9bf, #e87fa0);
+  transform-origin: left;
+  transition: transform 0.5s ease;
+}
+@keyframes loaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes petalPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* -------------------------------------------------------------------- CTA */
+.cta-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px env(safe-area-inset-bottom, 0px);
+  pointer-events: none;
+}
+.cta {
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  max-width: min(88vw, 350px);
+  padding: 18px 32px;
+  text-wrap: balance;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: linear-gradient(135deg, rgba(255, 250, 246, 0.8), rgba(253, 232, 238, 0.68));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #7b3b55;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(19px, 5.4vw, 23px);
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 10px 34px rgba(150, 60, 90, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.45s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+.cta.show {
+  opacity: 1;
+  visibility: visible;
+  animation: ctaIn 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s backwards;
+}
+.cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.7) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 0.9s ease;
+}
+.cta:hover:not(:disabled)::after {
+  transform: translateX(120%);
+}
+.cta:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.025);
+  box-shadow: 0 16px 42px rgba(150, 60, 90, 0.34), 0 0 0 6px rgba(255, 255, 255, 0.22), inset 0 1px 0 #fff;
+}
+.cta:active:not(:disabled) {
+  transform: scale(0.985);
+}
+.cta:disabled {
+  cursor: default;
+}
+.cta:focus-visible {
+  outline: 2px solid #e87fa0;
+  outline-offset: 4px;
+}
+@keyframes ctaIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+}
+
+/* --------------------------------------------------------- envelope + letter */
+.overlay-col {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: min(100vw, calc(100dvh * 0.5625)); /* keeps the 9:16 composition on desktop */
+  pointer-events: none;
+  z-index: 30;
+  --col-w: min(100vw, calc(100dvh * 0.5625));
+  --env-w: min(calc(var(--col-w) * 0.6), 240px);
+  --letter-w: min(92vw, max(calc(var(--col-w) * 0.9), 440px));
+}
+.env {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+  width: var(--env-w);
+  aspect-ratio: 1.55;
+  visibility: hidden;
+}
+.env-part {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+}
+.env-back {
+  z-index: 1;
+  background: linear-gradient(180deg, #f6cfdb, #f1bdcd);
+  box-shadow: 0 16px 34px rgba(170, 70, 100, 0.25);
+}
+.env-front {
+  z-index: 3;
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+  background: linear-gradient(160deg, #fdeef2, #f8d4df);
+}
+.env-flap {
+  z-index: 4;
+  clip-path: polygon(0 0, 100% 0, 50% 58%);
+  background: linear-gradient(180deg, #f9dbe5, #f2c0d0);
+}
+.env-seal {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  filter: drop-shadow(0 1px 2px rgba(120, 40, 70, 0.35));
+}
+
+.letter {
+  --crease: 1;
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 6px;
+  width: var(--letter-w);
+  margin-left: calc(var(--letter-w) / -2);
+  box-sizing: border-box;
+  padding: clamp(16px, 3dvh, 24px) clamp(18px, 3.2dvh, 26px) clamp(18px, 3.2dvh, 26px);
+  border-radius: 7px;
+  border: 1px solid rgba(240, 190, 205, 0.55);
+  background: linear-gradient(180deg, #fffdfa 0%, #fff8f0 100%);
+  box-shadow: 0 18px 44px rgba(190, 90, 125, 0.28), inset 0 2px 0 rgba(255, 255, 255, 0.8);
+  max-height: min(34dvh, 340px);
+  overflow: hidden auto;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+.letter::-webkit-scrollbar {
+  display: none;
+}
+.letter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--crease);
+  background: linear-gradient(
+    transparent calc(33.3% - 1px),
+    rgba(210, 150, 170, 0.35) 33.3%,
+    transparent calc(33.3% + 1px),
+    transparent calc(66.6% - 1px),
+    rgba(210, 150, 170, 0.35) 66.6%,
+    transparent calc(66.6% + 1px)
+  );
+}
+.letter-text {
+  margin: 0;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(15px, min(4.7vw, 3dvh), 21px);
+  line-height: 1.5;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.w {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-flower,
+  .loader-petal {
+    animation: none;
+  }
+  .cta.show {
+    animation: none;
+  }
+}
